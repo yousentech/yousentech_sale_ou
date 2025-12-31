@@ -20,7 +20,7 @@
         <field name="inherit_id" ref="sale.view_quotation_tree_with_onboarding"/>
         <field name="arch" type="xml">
              <xpath expr = "//field[@name = 'company_id']" position="after">
-                    <field name="operation_unit_id"  options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,'no_create': True}"/>
+                    <field name="operation_unit_id"  optional="hide" options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,'no_create': True}"/>
                 </xpath>
 
         </field>
@@ -31,9 +31,9 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_tree"/>
         <field name="arch" type="xml">
-           <xpath expr = "//field[@name = 'company_id']" position="after">
-                    <field name="operation_unit_id"  options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,'no_create': True}"/>
-                </xpath>
+            <xpath expr = "//field[@name = 'company_id']" position="after">
+                <field name="operation_unit_id"  optional="hide" options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,'no_create': True}"/>
+            </xpath>
         </field>
     </record>
 
