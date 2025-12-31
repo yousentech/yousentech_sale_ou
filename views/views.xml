@@ -12,5 +12,53 @@
             </xpath>
         </field>
     </record>
+
+    <!-- =================== Sale Order tree=================== -->
+    <record id="view_sale_order_quotation_tree_ou" model="ir.ui.view">
+        <field name="name">view_sale_order_quotation_tree_ou</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree_with_onboarding"/>
+        <field name="arch" type="xml">
+             <xpath expr = "//field[@name = 'company_id']" position="after">
+                    <field name="operation_unit_id"  options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,'no_create': True}"/>
+                </xpath>
+
+        </field>
+    </record>
  
+    <record id="view_sale_order_tree_ou" model="ir.ui.view">
+        <field name="name">view_sale_order_tree_ou</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="arch" type="xml">
+           <xpath expr = "//field[@name = 'company_id']" position="after">
+                    <field name="operation_unit_id"  options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,'no_create': True}"/>
+                </xpath>
+        </field>
+    </record>
+
+  <!-- =================== Sale Order search=================== -->
+    <record id="view_sale_order_search_ou" model="ir.ui.view">
+        <field name="name">view_sale_order_search_ou</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.sale_order_view_search_inherit_sale"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <field name="operation_unit_id"  options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,'no_create': True}"/>
+            </xpath>
+
+        </field>
+    </record>
+
+    <record id="view_sale_order_quotation_search_ou" model="ir.ui.view">
+        <field name="name">view_sale_order_quotation_search_ou</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.sale_order_view_search_inherit_quotation"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <field name="operation_unit_id"  options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,'no_create': True}"/>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>
