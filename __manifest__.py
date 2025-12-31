@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'yousentech_invoicing_ou',
+    'name': 'yousentech_sale_ou',
 	'version': '17.0.1.0.0',
-	'summary': 'yousentech_invoicing_ou',
+	'summary': 'yousentech_sale_ou',
 	'category': 'Tools',
 	'author': 'Developers team',
 	'maintainer': 'qimamhd-tech Techno Solutions',
@@ -16,7 +16,7 @@
    
 
     # any module necessary for this one to work correctly
-    'depends': ['base','account','purchase','sale','stock'],
+    'depends': ['base','account','sale'],
 
     # always loaded
     'data': [
