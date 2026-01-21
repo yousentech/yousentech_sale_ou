@@ -8,8 +8,70 @@ class xx_sale_order(models.Model):
     
     operation_unit_id = fields.Many2one('operation.unit',
                                     string='Operation Unit',
-                                    readonly=True,
+                                   
                                     copy=False)
+
+
+    
+    allowed_ou_domain = fields.Char(compute="get_allowed_ou_domain")
+
+    @api.depends('company_id','invoice_user_id')
+    def get_allowed_ou_domain(self):
+        for rec in self:
+            rec.allowed_ou_domain = [('id','in',self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == rec.company_id.id).allowed_ou_ids.ids)]
+  
+  
+    @api.model
+    def default_get(self, fields_list):
+        res = super().default_get(fields_list)
+
+        company_id = res.get('company_id', self.env.company.id)
+
+        if not res.get('operation_unit_id'):
+            ou = self.env.user.ou_config_ids.filtered(
+                lambda x: x.company_id.id == company_id
+            ).default_ou_id
+
+            if ou:
+                res['operation_unit_id'] = ou.id
+
+        return res
+    
+    @api.onchange('company_id')
+    def _onchange_company_id_set_ou(self):
+        for rec in self:
+            if not rec.company_id:
+                rec.operation_unit_id = False
+                return
+
+            # OU الحالي غير تابع للشركة
+            if rec.operation_unit_id and rec.operation_unit_id.company_id != rec.company_id:
+                rec.operation_unit_id = False
+
+            # تعيين OU افتراضي
+            if not rec.operation_unit_id:
+                ou = self.env.user.ou_config_ids.filtered(
+                    lambda x: x.company_id == rec.company_id
+                ).default_ou_id
+
+                if ou:
+                    rec.operation_unit_id = ou
+
+
+    allow_modify_ou_flag = fields.Boolean(
+        default=lambda self: self._default_allow_modify_ou_flag(),
+        compute="_check_allow_modify_ou_flag",
+    )
+    def _default_allow_modify_ou_flag(self):
+        
+        return self.user_has_groups('yousentech_invoicing_ou.group_allow_modify_ou')
+
+    def _check_allow_modify_ou_flag(self):
+        
+        for rec in self:
+            rec.allow_modify_ou_flag = self.user_has_groups('yousentech_invoicing_ou.group_allow_modify_ou')
+
+
     @api.model
     def create(self, vals):
         if not vals.get('operation_unit_id'):
