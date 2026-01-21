@@ -15,7 +15,7 @@ class xx_sale_order(models.Model):
     
     allowed_ou_domain = fields.Char(compute="get_allowed_ou_domain")
 
-    @api.depends('company_id','invoice_user_id')
+    @api.depends('company_id','user_id')
     def get_allowed_ou_domain(self):
         for rec in self:
             rec.allowed_ou_domain = [('id','in',self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == rec.company_id.id).allowed_ou_ids.ids)]
@@ -129,7 +129,7 @@ class xx_sale_order(models.Model):
 
         return res
 
-        
+
     def _sync_ou_to_invoices(self):
         for order in self:
             for inv in order.invoice_ids.filtered(lambda m: m.state != 'cancel'):
