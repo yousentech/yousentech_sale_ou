@@ -62,13 +62,14 @@ class AccountMove(models.Model):
 
     def _sync_ou_to_payments(self):
         for move in self:
-            payments = move.line_ids.mapped(
-                'matched_debit_ids.move_id'
-            ) | move.line_ids.mapped(
-                'matched_credit_ids.move_id'
-            )
+            payments = self.env['account.move']
+
+            for line in move.line_ids:
+                payments |= line.matched_debit_ids.mapped('move_id')
+                payments |= line.matched_credit_ids.mapped('move_id')
 
             payments = payments.filtered(lambda m: m.payment_id)
+
 
             for pay_move in payments:
                 payment = pay_move.payment_id
