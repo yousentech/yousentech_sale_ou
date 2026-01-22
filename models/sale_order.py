@@ -8,11 +8,8 @@ class xx_sale_order(models.Model):
     
     operation_unit_id = fields.Many2one('operation.unit',
                                     string='Operation Unit',
-                                   
                                     copy=False)
 
-
-    
     allowed_ou_domain = fields.Char(compute="get_allowed_ou_domain")
 
     @api.depends('company_id','user_id')
@@ -67,7 +64,6 @@ class xx_sale_order(models.Model):
         return self.user_has_groups('yousentech_invoicing_ou.group_allow_modify_ou')
 
     def _check_allow_modify_ou_flag(self):
-        
         for rec in self:
             rec.allow_modify_ou_flag = self.user_has_groups('yousentech_invoicing_ou.group_allow_modify_ou')
 
