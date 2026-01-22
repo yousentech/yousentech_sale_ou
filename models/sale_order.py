@@ -85,76 +85,34 @@ class xx_sale_order(models.Model):
         invoice_vals = super(xx_sale_order, self)._prepare_invoice()
         invoice_vals.update({"operation_unit_id": self.operation_unit_id.id or False})
         return invoice_vals
+   
+      
  
+
     def write(self, vals):
         if 'operation_unit_id' in vals:
             for order in self:
                 invoices = order.invoice_ids.filtered(lambda m: m.state != 'cancel')
 
-                for inv in invoices:
-                    # إذا ما عليها تسوية → OK
-                    reconciled_lines = inv.line_ids.filtered(
+                # تحقق من وجود فواتير مُسوّاة
+                reconciled_invoices = invoices.filtered(
+                    lambda inv: inv.line_ids.filtered(
                         lambda l: l.account_id.reconcile and l.reconciled
                     )
-                    if not reconciled_lines:
-                        continue
+                )
 
-                    # جلب OU الدفعات المسوّية
-                    payment_ous = reconciled_lines.mapped(
-                        'matched_debit_ids.move_id.operation_unit_id'
-                    ) | reconciled_lines.mapped(
-                        'matched_credit_ids.move_id.operation_unit_id'
+                if reconciled_invoices:
+                    raise ValidationError(
+                        _("You cannot change Operation Unit because related invoices are reconciled.")
                     )
-
-                    payment_ous = payment_ous.filtered(lambda x: x)
-
-                    # لو فيه اختلاف OU
-                    if payment_ous and any(
-                        ou.id != vals['operation_unit_id'] for ou in payment_ous
-                    ):
-                        raise ValidationError(
-                            _("Cannot change Operation Unit because related payments use a different OU.")
-                        )
 
         res = super().write(vals)
 
-        # مزامنة الفواتير بعد التغيير
+        # بعد التغيير → نزامن الفواتير
         if 'operation_unit_id' in vals:
             for order in self:
-                order._sync_ou_to_invoices()
+                for invoice in order.invoice_ids.filtered(lambda m: m.state != 'cancel'):
+                    invoice._sync_ou_from_sale_order()
 
         return res
-
-
-    def _sync_ou_to_invoices(self):
-        for order in self:
-            for inv in order.invoice_ids.filtered(lambda m: m.state != 'cancel'):
-                inv._sync_ou_from_sale_order()
-
-
-    # def write(self, vals):
-    #     if 'operation_unit_id' in vals:
-    #         for order in self:
-    #             invoices = order.invoice_ids.filtered(lambda m: m.state != 'cancel')
-
-    #             # تحقق من وجود فواتير مُسوّاة
-    #             reconciled_invoices = invoices.filtered(
-    #                 lambda inv: inv.line_ids.filtered(
-    #                     lambda l: l.account_id.reconcile and l.reconciled
-    #                 )
-    #             )
-
-    #             if reconciled_invoices:
-    #                 raise ValidationError(
-    #                     _("You cannot change Operation Unit because related invoices are reconciled.")
-    #                 )
-
-    #     res = super().write(vals)
-
-    #     # بعد التغيير → نزامن الفواتير
-    #     if 'operation_unit_id' in vals:
-    #         for order in self:
-    #             for invoice in order.invoice_ids.filtered(lambda m: m.state != 'cancel'):
-    #                 invoice._sync_ou_from_sale_order()
-
-    #     return res
+ 

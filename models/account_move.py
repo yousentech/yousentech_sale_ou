@@ -57,25 +57,25 @@ class AccountMove(models.Model):
                 'operation_unit_id': sale.operation_unit_id.id
             })
 
-            # لو عليها دفعات → نزامن الدفعات
-            move._sync_ou_to_payments()
+    #         # لو عليها دفعات → نزامن الدفعات
+    #         move._sync_ou_to_payments()
 
-    def _sync_ou_to_payments(self):
-        for move in self:
-            payments = self.env['account.move']
+    # def _sync_ou_to_payments(self):
+    #     for move in self:
+    #         payments = self.env['account.move']
 
-            for line in move.line_ids:
-                payments |= line.matched_debit_ids.mapped('move_id')
-                payments |= line.matched_credit_ids.mapped('move_id')
+    #         for line in move.line_ids:
+    #             payments |= line.matched_debit_ids.mapped('move_id')
+    #             payments |= line.matched_credit_ids.mapped('move_id')
 
-            payments = payments.filtered(lambda m: m.payment_id)
+    #         payments = payments.filtered(lambda m: m.payment_id)
 
 
-            for pay_move in payments:
-                payment = pay_move.payment_id
-                if not payment.operation_unit_id:
-                    payment.write({
-                        'operation_unit_id': move.operation_unit_id.id
-                    })
+    #         for pay_move in payments:
+    #             payment = pay_move.payment_id
+    #             if not payment.operation_unit_id:
+    #                 payment.write({
+    #                     'operation_unit_id': move.operation_unit_id.id
+    #                 })
 
 
