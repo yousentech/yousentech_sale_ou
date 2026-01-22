@@ -116,3 +116,13 @@ class xx_sale_order(models.Model):
 
         return res
  
+    @api.constrains('operation_unit_id', 'company_id')
+    def _check_ou_company(self):
+        for rec in self:
+            if rec.operation_unit_id and rec.company_id:
+                if rec.operation_unit_id.company_id != rec.company_id:
+                    raise ValidationError(
+                        "Operation Unit must belong to the selected company."
+                    )
+ 
+ 

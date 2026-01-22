@@ -5,7 +5,8 @@ from datetime import datetime
  
 class AccountMove(models.Model):
     _inherit ='account.move'
- 
+
+
     @api.constrains('invoice_line_ids', 'operation_unit_id')
     def _check_single_ou(self):
         for move in self:
