@@ -7,6 +7,26 @@ class AccountMove(models.Model):
     _inherit ='account.move'
 
 
+    def _compute_from_other_order(self):
+        for move in self:
+
+            res = super()._compute_from_other_order()
+            is_exsiting_sale_field = self.env['ir.model.fields'].sudo().search(
+                [('name', '=', 'sale_line_ids'), ('model', '=', 'account.move.line')])
+           
+          
+            from_sale_order=False
+           
+            if is_exsiting_sale_field:
+                from_sale_order = bool(move.invoice_line_ids.mapped('sale_line_ids.order_id'))
+              
+               
+            if from_sale_order:
+                move.from_other_order = True
+         
+            return res
+
+
     # @api.constrains('invoice_line_ids', 'operation_unit_id')
     def _check_single_ou(self):
         for move in self:
