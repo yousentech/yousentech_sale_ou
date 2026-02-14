@@ -7,7 +7,7 @@ class AccountMove(models.Model):
     _inherit ='account.move'
 
 
-    @api.constrains('invoice_line_ids', 'operation_unit_id')
+    # @api.constrains('invoice_line_ids', 'operation_unit_id')
     def _check_single_ou(self):
         for move in self:
             ous = self.env['operation.unit']
@@ -34,6 +34,7 @@ class AccountMove(models.Model):
                 raise ValidationError(
                     _('You cannot mix multiple Operation Units in one invoice.')
                 )
+        return super()._check_single_ou()
  
     
     def _sync_ou_from_sale_order(self):
