@@ -8,7 +8,7 @@ class xx_sale_order(models.Model):
     
     operation_unit_id = fields.Many2one('operation.unit',
                                     string='Operation Unit',
-                                    copy=False)
+                                    copy=False,domain=[('share_ou','=',False)])
 
     allowed_ou_domain = fields.Char(compute="get_allowed_ou_domain")
 
